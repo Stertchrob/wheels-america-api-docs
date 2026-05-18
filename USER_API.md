@@ -93,6 +93,94 @@ curl -X POST https://api.wheelsamerica.com/orders/place \
 
 ---
 
+### Get Inventory
+
+**GET** `/inventory/get`
+
+Retrieve current available wheel inventory. Optionally filter by interchange number.
+
+#### Request Headers
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `x-api-key` | Yes | Your API key |
+
+#### Query Parameters
+
+| Param | Required | Description |
+|-------|----------|-------------|
+| `interchange` | No | Filter results to a specific interchange number |
+
+#### Example Requests
+
+Get all inventory:
+
+```bash
+curl https://api.wheelsamerica.com/inventory/get \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+Filter by interchange number:
+
+```bash
+curl "https://api.wheelsamerica.com/inventory/get?interchange=10001" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `SKU` | string | Wheel SKU (e.g. `W020388`) |
+| `Interchange` | string | Interchange number |
+| `Available` | number | Total units available |
+| `Finished` | number | Total finished units |
+| `Price` | number | Unit price |
+| `Finish` | string | Wheel finish description |
+
+#### Responses
+
+**200 OK**
+
+```json
+{
+  "success": true,
+  "count": 3,
+  "inventory": [
+    {
+      "SKU": "W020388",
+      "Interchange": "10001",
+      "Available": 1,
+      "Finished": 1,
+      "Price": 241.38,
+      "Finish": "Gloss Black Gloss Black Powder Coat"
+    },
+    {
+      "SKU": "W020511",
+      "Interchange": "10001",
+      "Available": 4,
+      "Finished": 4,
+      "Price": 189.77,
+      "Finish": "Machined Lip w/ Charcoal Spokes"
+    }
+  ]
+}
+```
+
+**404 Not Found** — Inventory data not yet available.
+
+```json
+{ "error": "Inventory file not available" }
+```
+
+**500 Internal Server Error**
+
+```json
+{ "error": "Failed to retrieve inventory" }
+```
+
+---
+
 ### Rotate API Key
 
 **POST** `/keys/rotate`
