@@ -20,7 +20,7 @@ Your API key is tied to your company's customer account. Contact Wheels America 
 
 **POST** `/orders/place`
 
-Submit a purchase order for a wheel by Hollander number and variation.
+Submit a purchase order for a wheel by interchange number and variation.
 
 #### Request Headers
 
@@ -76,7 +76,7 @@ curl -X POST https://api.wheelsamerica.com/orders/place \
 **400 Bad Request** — Missing a required field.
 
 ```json
-{ "error": "Missing required field: Hollander" }
+{ "error": "Missing required field: Interchange" }
 ```
 
 **404 Not Found** — Invalid VariationID or customer account issue.
