@@ -137,6 +137,7 @@ curl "https://api.wheelsamerica.com/inventory/get?interchange=10001" \
 | `Finished` | number | Total finished units |
 | `Price` | number | Unit price |
 | `Finish` | string | Wheel finish description |
+| `Image` | string \| null | Wheel image URL (Cloudinary); `null` if no image is on file |
 
 #### Responses
 
@@ -153,7 +154,8 @@ curl "https://api.wheelsamerica.com/inventory/get?interchange=10001" \
       "Available": 1,
       "Finished": 1,
       "Price": 241.38,
-      "Finish": "Gloss Black Gloss Black Powder Coat"
+      "Finish": "Gloss Black Gloss Black Powder Coat",
+      "Image": "https://res.cloudinary.com/wheels-america/image/upload/t_Wheel_400_2/f_auto/v1234567890/example.jpg"
     },
     {
       "SKU": "W020511",
@@ -161,7 +163,8 @@ curl "https://api.wheelsamerica.com/inventory/get?interchange=10001" \
       "Available": 4,
       "Finished": 4,
       "Price": 189.77,
-      "Finish": "Machined Lip w/ Charcoal Spokes"
+      "Finish": "Machined Lip w/ Charcoal Spokes",
+      "Image": null
     }
   ]
 }
