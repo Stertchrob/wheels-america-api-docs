@@ -184,6 +184,178 @@ curl "https://api.wheelsamerica.com/inventory/get?interchange=10001" \
 
 ---
 
+### Get Fitment
+
+**GET** `/inventory/fitment`
+
+Retrieve vehicle fitment data (Year, Make, Model, Submodel, Engines) for wheels. Optionally filter by interchange number or SKU.
+
+#### Request Headers
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `x-api-key` | Yes | Your API key |
+
+#### Query Parameters
+
+| Param | Required | Description |
+|-------|----------|-------------|
+| `interchange` | No | Filter results to a specific interchange number |
+| `sku` | No | Filter results by SKU (decoded to VariationID). Cannot be combined with `interchange` |
+
+#### Example Requests
+
+Get all fitment data:
+
+```bash
+curl https://api.wheelsamerica.com/inventory/fitment \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+Filter by interchange number:
+
+```bash
+curl "https://api.wheelsamerica.com/inventory/fitment?interchange=70235" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+Filter by SKU:
+
+```bash
+curl "https://api.wheelsamerica.com/inventory/fitment?sku=W004821" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `Year` | number | Vehicle model year |
+| `Make` | string | Vehicle manufacturer (e.g. `Toyota`) |
+| `Model` | string | Vehicle model (e.g. `Camry`) |
+| `Submodel` | string | Vehicle submodel/trim (e.g. `LE`, `Sport`) |
+| `Engines` | string | Engine specification (e.g. `2.5L L4`) |
+
+#### Responses
+
+**200 OK**
+
+```json
+{
+  "success": true,
+  "count": 4,
+  "fitment": [
+    {
+      "Year": 2020,
+      "Make": "Toyota",
+      "Model": "Camry",
+      "Submodel": "LE",
+      "Engines": "2.5L L4"
+    },
+    {
+      "Year": 2021,
+      "Make": "Toyota",
+      "Model": "Camry",
+      "Submodel": "SE",
+      "Engines": "2.5L L4"
+    }
+  ]
+}
+```
+
+**400 Bad Request** — Both `interchange` and `sku` were provided, or SKU could not be decoded.
+
+```json
+{ "error": "Provide either interchange or sku, not both" }
+```
+
+```json
+{ "error": "Could not derive VariationID from SKU" }
+```
+
+**500 Internal Server Error**
+
+```json
+{ "error": "Failed to retrieve fitment data" }
+```
+
+---
+
+### Get Locations
+
+**GET** `/inventory/locations`
+
+Retrieve per-store inventory counts for a wheel by SKU. Returns all 6 warehouse locations with their unit count (0 if none in stock at that location).
+
+#### Request Headers
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `x-api-key` | Yes | Your API key |
+
+#### Query Parameters
+
+| Param | Required | Description |
+|-------|----------|-------------|
+| `sku` | Yes | Wheel SKU (e.g. `W004821`) |
+
+#### Example Request
+
+```bash
+curl "https://api.wheelsamerica.com/inventory/locations?sku=W004821" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `sku` | string | The SKU that was queried |
+| `locations` | object | Counts per warehouse |
+| `locations.DA` | number | Units at Dallas |
+| `locations.SA` | number | Units at San Antonio |
+| `locations.HO` | number | Units at Houston |
+| `locations.LA` | number | Units at Los Angeles |
+| `locations.SF` | number | Units at San Francisco |
+| `locations.PH` | number | Units at Philadelphia |
+
+#### Responses
+
+**200 OK**
+
+```json
+{
+  "success": true,
+  "sku": "W004821",
+  "locations": {
+    "DA": 3,
+    "SA": 0,
+    "HO": 1,
+    "LA": 0,
+    "SF": 2,
+    "PH": 0
+  }
+}
+```
+
+**400 Bad Request** — Missing SKU or could not decode it.
+
+```json
+{ "error": "Missing required parameter: sku" }
+```
+
+```json
+{ "error": "Could not derive VariationID from SKU" }
+```
+
+**500 Internal Server Error**
+
+```json
+{ "error": "Failed to retrieve location data" }
+```
+
+---
+
 ### Rotate API Key
 
 **POST** `/keys/rotate`
