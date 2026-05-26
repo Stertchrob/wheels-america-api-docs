@@ -311,13 +311,12 @@ curl "https://api.wheelsamerica.com/inventory/locations?sku=W004821" \
 | Field | Type | Description |
 |-------|------|-------------|
 | `sku` | string | The SKU that was queried |
-| `locations` | object | Counts per warehouse |
-| `locations.DA` | number | Units at Dallas |
-| `locations.SA` | number | Units at San Antonio |
-| `locations.HO` | number | Units at Houston |
-| `locations.LA` | number | Units at Los Angeles |
-| `locations.SF` | number | Units at San Francisco |
-| `locations.PH` | number | Units at Philadelphia |
+| `locations` | object | Per-warehouse breakdown |
+| `locations.<STORE>.qty` | number | Total units at that warehouse |
+| `locations.<STORE>.finished` | number | Finished (ready to ship) units |
+| `locations.<STORE>.cores` | number | Core (unfinished) units |
+
+Store codes: `DA` (Dallas), `SA` (San Antonio), `HO` (Houston), `LA` (Los Angeles), `SF` (San Francisco), `PH` (Philadelphia).
 
 #### Responses
 
@@ -328,12 +327,12 @@ curl "https://api.wheelsamerica.com/inventory/locations?sku=W004821" \
   "success": true,
   "sku": "W004821",
   "locations": {
-    "DA": 3,
-    "SA": 0,
-    "HO": 1,
-    "LA": 0,
-    "SF": 2,
-    "PH": 0
+    "DA": { "qty": 3, "finished": 2, "cores": 1 },
+    "SA": { "qty": 0, "finished": 0, "cores": 0 },
+    "HO": { "qty": 1, "finished": 1, "cores": 0 },
+    "LA": { "qty": 0, "finished": 0, "cores": 0 },
+    "SF": { "qty": 2, "finished": 2, "cores": 0 },
+    "PH": { "qty": 0, "finished": 0, "cores": 0 }
   }
 }
 ```
