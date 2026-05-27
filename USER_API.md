@@ -132,6 +132,7 @@ curl "https://api.wheelsamerica.com/inventory/get?interchange=10001" \
 | Field | Type | Description |
 |-------|------|-------------|
 | `SKU` | string | Wheel SKU (e.g. `W020388`) |
+| `VariationID` | number | Wheel variation ID (determines finish/style) |
 | `Interchange` | string | Interchange number |
 | `Available` | number | Total units available |
 | `Finished` | number | Total finished units |
@@ -150,6 +151,7 @@ curl "https://api.wheelsamerica.com/inventory/get?interchange=10001" \
   "inventory": [
     {
       "SKU": "W020388",
+      "VariationID": 20388,
       "Interchange": "10001",
       "Available": 1,
       "Finished": 1,
@@ -159,6 +161,7 @@ curl "https://api.wheelsamerica.com/inventory/get?interchange=10001" \
     },
     {
       "SKU": "W020511",
+      "VariationID": 48305,
       "Interchange": "10001",
       "Available": 4,
       "Finished": 4,
