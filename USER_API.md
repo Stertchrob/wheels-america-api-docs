@@ -69,8 +69,15 @@ curl -X POST https://api.wheelsamerica.com/orders/place \
 
 **201 Created**
 
+`OrderNumber` is the Wheels America order number for this line. Save it and use it to check status and tracking. Each request creates one order.
+
 ```json
-{ "success": true, "message": "Order placed successfully" }
+{
+  "success": true,
+  "message": "Order placed successfully",
+  "OrderNumber": 482910,
+  "PO": "PO-12345"
+}
 ```
 
 **400 Bad Request** — Missing a required field.
@@ -89,6 +96,168 @@ curl -X POST https://api.wheelsamerica.com/orders/place \
 
 ```json
 { "error": "Failed to place order" }
+```
+
+---
+
+### Get Order
+
+**GET** `/orders/:orderNumber`
+
+Retrieve status, quantity sent, carrier, and tracking numbers for one order placed through this API.
+
+#### Request Headers
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `x-api-key` | Yes | Your API key |
+
+#### Path Parameters
+
+| Param | Required | Description |
+|-------|----------|-------------|
+| `orderNumber` | Yes | `OrderNumber` returned when the order was placed |
+
+#### Example Request
+
+```bash
+curl https://api.wheelsamerica.com/orders/482910 \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `OrderNumber` | number | Wheels America order number |
+| `PO` | string | Your purchase order number |
+| `Status` | string | `Open`, `Processing`, `Partial`, `Shipped`, `Cancelled`, `Refunded`, or `Closed` |
+| `SKU` | string | Wheel SKU |
+| `Interchange` | string | Interchange number |
+| `Qty` | number | Quantity ordered |
+| `QtySent` | number | Quantity shipped. `0` until a shipment has a carrier and tracking number |
+| `OrderDate` | string \| null | Order date in UTC |
+| `Shipments` | array | Shipped shipments. Empty until a shipment has a carrier and tracking number |
+| `Shipments[].QtySent` | number | Quantity on that shipment |
+| `Shipments[].ShipDate` | string \| null | Ship date in UTC |
+| `Shipments[].Packages` | array | Labels for that shipment. Quantity is on the shipment, not on each label |
+| `Shipments[].Packages[].Carrier` | string | Carrier name |
+| `Shipments[].Packages[].TrackingNumber` | string | Tracking number |
+
+`Processing` covers orders that have been received and are being filled. `Partial` means some of the ordered quantity has shipped.
+
+#### Responses
+
+**200 OK**
+
+```json
+{
+  "success": true,
+  "order": {
+    "OrderNumber": 482910,
+    "PO": "PO-12345",
+    "Status": "Shipped",
+    "SKU": "W004821",
+    "Interchange": "70235",
+    "Qty": 2,
+    "QtySent": 2,
+    "OrderDate": "2026-11-03T15:04:00.000Z",
+    "Shipments": [
+      {
+        "QtySent": 2,
+        "ShipDate": "2026-11-04T18:10:00.000Z",
+        "Packages": [
+          { "Carrier": "UPS", "TrackingNumber": "1Z999AA10123456784" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**400 Bad Request** — Order number is not a positive integer.
+
+```json
+{ "error": "Invalid order number" }
+```
+
+**404 Not Found** — No order with that number for your account.
+
+```json
+{ "error": "Order not found" }
+```
+
+**500 Internal Server Error**
+
+```json
+{ "error": "Failed to retrieve order" }
+```
+
+---
+
+### Get Orders by PO
+
+**GET** `/orders?po=`
+
+Retrieve every order placed through this API for your account with that purchase order number. A PO can match more than one order, because each place-order request is one line.
+
+#### Request Headers
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `x-api-key` | Yes | Your API key |
+
+#### Query Parameters
+
+| Param | Required | Description |
+|-------|----------|-------------|
+| `po` | Yes | Your purchase order number |
+
+#### Example Request
+
+```bash
+curl "https://api.wheelsamerica.com/orders?po=PO-12345" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+The `orders` array uses the same order object as Get Order.
+
+#### Responses
+
+**200 OK**
+
+```json
+{
+  "success": true,
+  "count": 1,
+  "orders": [
+    {
+      "OrderNumber": 482910,
+      "PO": "PO-12345",
+      "Status": "Open",
+      "SKU": "W004821",
+      "Interchange": "70235",
+      "Qty": 2,
+      "QtySent": 0,
+      "OrderDate": "2026-11-03T15:04:00.000Z",
+      "Shipments": []
+    }
+  ]
+}
+```
+
+A PO with no matching orders returns `count: 0` and an empty `orders` array.
+
+**400 Bad Request** — Missing PO.
+
+```json
+{ "error": "Missing required parameter: po" }
+```
+
+**500 Internal Server Error**
+
+```json
+{ "error": "Failed to retrieve orders" }
 ```
 
 ---
